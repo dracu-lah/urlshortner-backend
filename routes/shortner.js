@@ -3,15 +3,28 @@ import { ShortnerModel } from "../models/shortner.js";
 import { nanoid } from "nanoid";
 const shortnerRouter = express.Router();
 
+// Get All URLS
 shortnerRouter.get("/", async (req, res) => {
   const { email } = req.params;
   const data = await ShortnerModel.find({ email }).exec();
   res.send({ message: "Fetched All URLs", data });
 });
 
+// Create A Shortned Url
 shortnerRouter.post("/", async (req, res) => {
-  const { email, url } = req.body;
-  const shortenedUrl = nanoid(10);
+  const { email, url, customShortenedUrl } = req.body;
+  const customShortenedUrlExists = await ShortnerModel.findOne(
+    {
+      shortenedUrl: customShortenedUrl,
+    },
+    "url",
+  ).exec();
+  if (customShortenedUrlExists) {
+    res.status(409).send({ message: "This Link Exists Already" });
+  }
+
+  const shortenedUrl = customShortenedUrl || nanoid(10);
+
   const postValue = new ShortnerModel({
     url,
     shortenedUrl,
@@ -21,6 +34,7 @@ shortnerRouter.post("/", async (req, res) => {
   res.send({ message: "Added URL Successfully", data });
 });
 
+// Get the Shortned Url
 shortnerRouter.get("/:shortenedUrl", async (req, res) => {
   const { shortenedUrl } = req.params;
   const userAgent = req.headers["user-agent"];
@@ -39,7 +53,7 @@ shortnerRouter.get("/:shortenedUrl", async (req, res) => {
 
     res.redirect(data.url);
   } else {
-    res.status(500).send({ message: "Something Went Wrong" });
+    res.status(404).send({ message: "Shortned Link Not Found" });
   }
 });
 
