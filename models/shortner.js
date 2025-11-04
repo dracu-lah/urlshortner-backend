@@ -5,5 +5,6 @@ export const shortnerSchema = new mongoose.Schema({
   shortenedUrl: { type: String, required: true },
   clicks: [{ timeStamp: Date, userAgent: String }],
   email: { type: String, required: true },
+  timeStamp: { type: Date, required: true },
 });
 export const ShortnerModel = mongoose.model("ShortnerModel", shortnerSchema);

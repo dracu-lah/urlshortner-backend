@@ -5,20 +5,22 @@ const shortnerRouter = express.Router();
 
 // Get All URLS
 shortnerRouter.get("/", async (req, res) => {
-  const { email } = req.params;
-  const data = await ShortnerModel.find({ email }).exec();
+  const { email } = req.query;
+  const data = await ShortnerModel.find({
+    email: email,
+  }).exec();
+
   res.send({ message: "Fetched All URLs", data });
 });
 
 // Create A Shortned Url
 shortnerRouter.post("/", async (req, res) => {
   const { email, url, customShortenedUrl } = req.body;
-  const customShortenedUrlExists = await ShortnerModel.findOne(
-    {
-      shortenedUrl: customShortenedUrl,
-    },
-    "url",
-  ).exec();
+
+  const customShortenedUrlExists = await ShortnerModel.findOne({
+    shortenedUrl: customShortenedUrl,
+  }).exec();
+  console.log(customShortenedUrlExists);
 
   if (customShortenedUrlExists) {
     res.status(409).send({ message: "This Link Exists Already" });
@@ -30,8 +32,11 @@ shortnerRouter.post("/", async (req, res) => {
     url,
     shortenedUrl,
     email,
+    timeStamp: Date.now(),
   });
+
   const data = await postValue.save();
+
   res.send({ message: "Added URL Successfully", data });
 });
 
@@ -49,7 +54,7 @@ shortnerRouter.get("/:shortenedUrl", async (req, res) => {
   if (data) {
     await ShortnerModel.updateOne(
       { shortenedUrl },
-      { clicks: [{ timeStamp: Date.now(), userAgent }] },
+      { $push: { clicks: { timeStamp: Date.now(), userAgent } } },
     );
 
     res.redirect(data.url);
