@@ -1,14 +1,15 @@
 # Url Shortner
 
-POST: /api/shortner
+## GET: /api/shortner?email=youremail@gmail.com
 
-```json
+## POST: /api/shortner
+
+```js
 {
-  "url": "https://www.google.com",
-  "email": "nevilkrishna@gmail.com"
+  "url": "https://www.yourwebsite.com",
+  "email": "youremail@gmail.com",
+  "customShortenedUrl": "custom-nevil" //Optional
 }
 ```
 
-```
-
-```
+## GET: /api/shortner/:shortenedUrl

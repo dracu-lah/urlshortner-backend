@@ -19,6 +19,7 @@ shortnerRouter.post("/", async (req, res) => {
     },
     "url",
   ).exec();
+
   if (customShortenedUrlExists) {
     res.status(409).send({ message: "This Link Exists Already" });
   }
