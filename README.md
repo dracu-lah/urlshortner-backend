@@ -2,7 +2,11 @@
 
 ## GET: /api/shortner?email=youremail@gmail.com
 
+#### Lists all the shortned links of a user
+
 ## POST: /api/shortner
+
+#### Create a new shortened url
 
 ```js
 {
@@ -13,3 +17,5 @@
 ```
 
 ## GET: /api/shortner/:shortenedUrl
+
+#### Open the shortened the url
