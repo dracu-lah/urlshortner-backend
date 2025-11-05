@@ -20,27 +20,40 @@ shortnerRouter.get("/", async (req, res) => {
 // Create A Shortned Url
 shortnerRouter.post("/", async (req, res) => {
   const { email, url, customShortenedUrl } = req.body;
+  const [currentDateString] = new Date().toLocaleString().split(",");
+  const todaysCount = await ShortnerModel.find({
+    email: email,
+    timeStamp: { $gte: new Date(currentDateString) },
+  })
+    .countDocuments()
+    .exec();
 
-  const customShortenedUrlExists = await ShortnerModel.findOne({
-    shortenedUrl: customShortenedUrl,
-  }).exec();
+  if (todaysCount > 5) {
+    res
+      .status(429)
+      .send({ message: "Limit Reached For Today, Try Again Next Day!" });
+  } else {
+    const customShortenedUrlExists = await ShortnerModel.findOne({
+      shortenedUrl: customShortenedUrl,
+    }).exec();
 
-  if (customShortenedUrlExists) {
-    res.status(409).send({ message: "This Link Exists Already" });
+    if (customShortenedUrlExists) {
+      res.status(409).send({ message: "This Link Exists Already" });
+    }
+
+    const shortenedUrl = customShortenedUrl || nanoid(10);
+
+    const postValue = new ShortnerModel({
+      url,
+      shortenedUrl,
+      email,
+      timeStamp: Date.now(),
+    });
+
+    const data = await postValue.save();
+
+    res.send({ message: "Added URL Successfully", data });
   }
-
-  const shortenedUrl = customShortenedUrl || nanoid(10);
-
-  const postValue = new ShortnerModel({
-    url,
-    shortenedUrl,
-    email,
-    timeStamp: Date.now(),
-  });
-
-  const data = await postValue.save();
-
-  res.send({ message: "Added URL Successfully", data });
 });
 
 shortnerRouter.delete("/:id", async (req, res) => {
