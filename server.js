@@ -10,7 +10,12 @@ const port = process.env.NODE_ENV_PORT || 3000;
 
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: "https://urlshortner-next.vercel.app",
+    optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+  }),
+);
 
 app.get("/", (req, res) => {
   res.send("Welcome To Shortly Backend!");
