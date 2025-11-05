@@ -10,7 +10,11 @@ shortnerRouter.get("/", async (req, res) => {
     email: email,
   }).exec();
 
-  res.send({ message: "Fetched All URLs", data });
+  if (data) {
+    res.send({ message: "Fetched All URLs", data });
+  }
+
+  res.send({ message: "Fetched All URLs", data: [] });
 });
 
 // Create A Shortned Url
@@ -20,7 +24,6 @@ shortnerRouter.post("/", async (req, res) => {
   const customShortenedUrlExists = await ShortnerModel.findOne({
     shortenedUrl: customShortenedUrl,
   }).exec();
-  console.log(customShortenedUrlExists);
 
   if (customShortenedUrlExists) {
     res.status(409).send({ message: "This Link Exists Already" });
