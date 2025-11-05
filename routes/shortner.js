@@ -21,6 +21,7 @@ shortnerRouter.get("/", async (req, res) => {
 shortnerRouter.post("/", async (req, res) => {
   const { email, url, customShortenedUrl } = req.body;
   const [currentDateString] = new Date().toLocaleString().split(",");
+  console.log(currentDateString);
   const todaysCount = await ShortnerModel.find({
     email: email,
     timeStamp: { $gte: new Date(currentDateString) },
