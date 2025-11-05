@@ -29,6 +29,7 @@ shortnerRouter.post("/", async (req, res) => {
     .countDocuments()
     .exec();
 
+  console.log(todaysCount);
   if (todaysCount > 5) {
     res
       .status(429)
