@@ -21,7 +21,6 @@ shortnerRouter.get("/", async (req, res) => {
 shortnerRouter.post("/", async (req, res) => {
   const { email, url, customShortenedUrl } = req.body;
   const [currentDateString] = new Date().toLocaleString().split(",");
-  console.log(currentDateString);
   const todaysCount = await ShortnerModel.find({
     email: email,
     timeStamp: { $gte: new Date(currentDateString) },
@@ -29,8 +28,7 @@ shortnerRouter.post("/", async (req, res) => {
     .countDocuments()
     .exec();
 
-  console.log(todaysCount);
-  if (todaysCount > 5) {
+  if (todaysCount > 4) {
     res
       .status(429)
       .send({ message: "Limit Reached For Today, Try Again Next Day!" });
