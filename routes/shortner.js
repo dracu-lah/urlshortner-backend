@@ -41,7 +41,8 @@ shortnerRouter.post("/", async (req, res) => {
       res.status(409).send({ message: "This Link Exists Already" });
     }
 
-    const shortenedUrl = customShortenedUrl || nanoid(10);
+    const shortenedUrl =
+      customShortenedUrl || (await generateFunction(nanoid(6)));
 
     const postValue = new ShortnerModel({
       url,
@@ -56,6 +57,7 @@ shortnerRouter.post("/", async (req, res) => {
   }
 });
 
+// Delete
 shortnerRouter.delete("/:id", async (req, res) => {
   const { id } = req.params;
   if (id) {
@@ -65,6 +67,13 @@ shortnerRouter.delete("/:id", async (req, res) => {
   res.status(500).send({ message: "Deletion Failed" });
 });
 
-// Get the Shortned Url
-
+async function generateFunction(value) {
+  const customShortenedUrlExists = await ShortnerModel.findOne({
+    shortenedUrl: value,
+  }).exec();
+  if (customShortenedUrlExists) {
+    return generateFunction(value);
+  }
+  return value;
+}
 export default shortnerRouter;
