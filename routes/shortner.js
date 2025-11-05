@@ -40,27 +40,15 @@ shortnerRouter.post("/", async (req, res) => {
   res.send({ message: "Added URL Successfully", data });
 });
 
-// Get the Shortned Url
-shortnerRouter.get("/:shortenedUrl", async (req, res) => {
-  const { shortenedUrl } = req.params;
-  const userAgent = req.headers["user-agent"];
-  const data = await ShortnerModel.findOne(
-    {
-      shortenedUrl,
-    },
-    "url",
-  ).exec();
-
-  if (data) {
-    await ShortnerModel.updateOne(
-      { shortenedUrl },
-      { $push: { clicks: { timeStamp: Date.now(), userAgent } } },
-    );
-
-    res.redirect(data.url);
-  } else {
-    res.status(404).send({ message: "Shortned Link Not Found" });
+shortnerRouter.delete("/:id", async (req, res) => {
+  const { id } = req.params;
+  if (id) {
+    await ShortnerModel.deleteOne({ _id: id });
+    res.send({ message: "Deleted The Shortened Url" });
   }
+  res.status(500).send({ message: "Deletion Failed" });
 });
+
+// Get the Shortned Url
 
 export default shortnerRouter;

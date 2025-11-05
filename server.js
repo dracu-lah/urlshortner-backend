@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 import shortnerRouter from "./routes/shortner.js";
 import bodyParser from "body-parser";
+import { ShortnerModel } from "./models/shortner.js";
 const app = express();
 const port = process.env.NODE_ENV_PORT || 3000;
 
@@ -14,7 +15,31 @@ app.use(cors());
 app.get("/", (req, res) => {
   res.send("Welcome To Shortly Backend!");
 });
+
+app.get("/:shortenedUrl", async (req, res) => {
+  const { shortenedUrl } = req.params;
+  const userAgent = req.headers["user-agent"];
+  const data = await ShortnerModel.findOne(
+    {
+      shortenedUrl,
+    },
+    "url",
+  ).exec();
+
+  if (data) {
+    await ShortnerModel.updateOne(
+      { shortenedUrl },
+      { $push: { clicks: { timeStamp: Date.now(), userAgent } } },
+    );
+
+    res.redirect(data.url);
+  } else {
+    res.status(404).send({ message: "Shortned Link Not Found" });
+  }
+});
+
 app.use("/api/shortner", shortnerRouter);
+
 mongoDbConnection().catch((err) => console.log(err));
 
 async function mongoDbConnection() {
